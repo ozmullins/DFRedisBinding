@@ -1,0 +1,6 @@
+Ext/target
+Ext/Cargo.lock
+
+IdeSrc/
+Data/
+AppSrc/DFRedisBinding.cfg

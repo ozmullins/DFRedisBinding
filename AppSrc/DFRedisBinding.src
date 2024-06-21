@@ -1,0 +1,52 @@
+﻿External_Function _RedisConn "createRedisConnection" df_redis_binding.dll ;
+    String sHost Returns Pointer
+    
+External_Function _RedisSet "setRedisKey" df_redis_binding.dll ;
+    Pointer pRedis String sKey String sValue Returns Void_Type
+    
+External_Function _RedisGet "getRedisKey" df_redis_binding.dll ;
+    Pointer pRedis String sKey Returns String
+    
+External_Function _RedisDestroy "destroyRedisConnection" df_redis_binding.dll ;
+    Pointer pRedis Returns Void_Type
+    
+Class cRedis is a cObject
+    Procedure Construct_Object
+        Property Pointer ppConnection
+        Property String psHost
+    End_Procedure
+    
+    Procedure End_Construct_Object
+        Pointer pConnection
+        String sUrl
+        
+        If (psHost(Self) = "") Begin
+            Error DFERR_PROGRAM "Cannot start without a host specified"
+        End
+        Else Begin
+            Get psHost to sUrl
+            Move (_RedisConn(sUrl)) to pConnection
+            Set ppConnection to pConnection
+        End
+    End_Procedure
+    
+    Procedure Destroy_Object
+        Void_Type void
+        
+        Move (_RedisDestroy(ppConnection(Self))) to void
+    End_Procedure
+    
+    Procedure SetValue String sKey String sValue
+        Integer iRetValue
+        
+        Move (_RedisSet(ppConnection(Self), sKey, sValue)) to iRetValue
+    End_Procedure
+    
+    Function GetValue String sKey Returns String
+        String sReturnValue
+        
+        Move (_RedisGet(ppConnection(Self), sKey)) to sReturnValue
+        
+        Function_Return sReturnValue
+    End_Function
+End_Class
